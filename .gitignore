@@ -1,40 +1,6 @@
-.DS_Store
-node_modules/
-
-# Build output
-dist/
-.astro/
-.cache/
-build/
-out/
-
-# Environment files
-.env
-.env.*.local
-
-# Vercel / Netlify
-.vercel/
-.netlify/
-
-# IDEs
-.vscode/
-.idea/
-
-# Logs
-npm-debug.log*
-yarn-debug.log*
-pnpm-debug.log*
-*.log
-
-# macOS
-.DS_Store
-
-# Misc
-Thumbs.db
 # build output
 dist/
-# generated types
-.astro/
+.output/
 
 # dependencies
 node_modules/
@@ -53,5 +19,6 @@ pnpm-debug.log*
 # macOS-specific files
 .DS_Store
 
-# jetbrains setting folder
-.idea/
+pnpm-lock.yaml
+
+.astro
