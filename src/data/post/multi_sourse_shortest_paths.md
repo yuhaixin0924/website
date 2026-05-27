@@ -657,3 +657,463 @@ int main(){
     }
 }
 ```
+## 一些现代导航工具常用到的算法
+### A*算法
+虽然Dijkstra能高效得到单个源结点到剩余所有结点的最短路径，但是在实际生活中，我们用导航软件比如谷歌地图时，我们需要输入起点和终点，而此时导航软件只需要返回这两个结点之间的最短路径即可。但是，我们用Dijkstra求得这两点的最短路径前，会将非源结点都探索一遍，这显然是没必要的，举个例子：
+> 如果说你现在在湖南，你想到北京，但是在Dijkstra运行过程中会向南探索到一条经过深圳的路径，这不是南辕北辙，越走越远吗
+
+为了让我们的Dijkstra算法更加智能，我们需要引入一个函数$h$来引导Dijkstra选择结点，我们先通过$h$重新定义边权：
+$$
+\hat{w}(u,v)=w(u,v)+h(v)-h(u)
+$$
+一种对于函数$h$的有趣理解是它代表了一个结点的“势能”，因为我们从$u$“下山”，“势能”减少$h(u)$,随后我们从$v$又上山,“势能”增加$h(v)$
+
+如果我们设一条路径$p=<v_{0},v_{1},...,v_{k}>$为$v_0$到$v_k$的一条最短路径，
+$$
+\hat{w}(p)=w(p)+h(v_{k})-h(v_{0})
+$$
+$$
+\hat{w}(p) = \sum_{i=1}^k \hat{w}(v_{i-1}, v_i) 
+$$
+$$
+= \sum_{i=1}^k \bigl( w(v_{i-1}, v_i) + h(v_{i}) - h(v_{i-1}) \bigr)
+$$
+$$
+= \sum_{i=1}^k w(v_{i-1}, v_i) + h(v_k) - h(v_0) \qquad (\text{裂项相消})
+$$
+$$
+= w(p) + h(v_k) - h(v_0)
+$$
+因为是最短路径所以有
+$w(p)=\delta(v_0,v_k)$ ,$\hat{w}(p)=\hat{\delta}(v_0,v_k)$
+所以有：
+$$
+\hat{\delta}(v_0,v_k)=\delta(v_0,v_k)+h(v_k) - h(v_0)
+$$
+一般我们把$h(v_k)$设为0，同时由于$\hat{\delta}(v_0,v_k)$非负
+所以有：
+$$
+h(v_0)\leq \delta(v_0,v_k)
+$$
+这是我们选取$h$时必须满足的条件，如果满足，我们称$h$是**可采纳的**
+#### 举个例子
+我们从$S$结点出发，需要找一条通往结点$T$的最短路径，对于任意结点$v\in$($A*$算法探索过程中经过的结点)，都有：
+$$
+h(v)\leq \delta(v,T)
+$$
+你可能会好奇，我连$\delta(v,T)$都不知道，我怎么保证$h(v)\leq \delta(v,T)$?
+事实上，我们不需要找到$\delta(v,T)$，也能使$h(v)\leq \delta(v,T)$
+1. 如果只允许上下移动，可以选择曼哈顿距离作为$h$(因为在实际中路面回有障碍物，所以曼哈顿距离小于等于实际的曼哈顿路径长度)
+2. 如果允许向各个方向移动，可以选择欧几里得距离作为$h$(因为两点之间线段最短)
+#### 在实际代码实现时需要注意的
+
+之前说过，我们可以先改变边权，再在新图上运行Dijkstra得到最短路径，
+以
+$$
+\hat{w}(u,v)=w(u,v)+h(v)-h(u)
+$$
+为前提，我们推导得到
+$$
+\hat{\delta}(S,v)=\delta(S,v)+h(v) - h(S) \leq \delta(S,v)+\delta(v,T)-h(S)
+$$
+于是我们重新定义
+$\hat{distance}(S,v)=\hat{\delta}(S,v)=\delta(S,v)+h(v) - h(S)=distance(S,v)+h(v)-h(S)$
+由于每个结点都从$S$出发，所以都$-h(S)$，不影响结点距离值之间的相对大小
+所以$\hat{distance}(S,v)=distance(S,v)+h(v)$
+注意$\hat{distance}(S,v)$是优先队列排序的标准，$\hat{distance}(S,v)$越小，越早被弹出
+通过改写$distance(S,v)$而不是直接改写$w(u,v)$的好处是不用遍历并改写整个邻接矩阵，而是在需要时再计算$\hat{distance}(S,v)$
+#### cpp实现
+```cpp
+#include<iostream>
+#include<vector>
+#include<queue>
+#include<sstream>
+#include<climits>
+#include<algorithm>
+using namespace std;
+
+void Relax(int u,int v,int weight,vector<int> & distance,vector<int>& parent){
+    if(distance[u]!=INT_MAX&&distance[v]>distance[u]+weight){
+        distance[v]=distance[u]+weight;
+        parent[v]=u;
+    }
+}
+
+struct Node {
+    int f;  // hatdistance = g + h，用于优先队列排序
+    int g;  // 从源点到当前点的真实距离
+    int u;
+};
+
+struct Compare {
+    bool operator()(const Node& a, const Node& b) const {
+        if (a.f != b.f) return a.f > b.f;
+        return a.g > b.g;
+    }
+};
+
+void AStar(int s,int t,const vector<vector<pair<int,int>>> & edges,
+           const vector<int>& h, vector<int> & distance, vector<int> & parent){
+    priority_queue<Node,vector<Node>,Compare> Q;
+    vector<bool> closed(distance.size(), false);
+
+    distance[s]=0;
+    Q.push({distance[s] + h[s], distance[s], s});
+
+    while(!Q.empty()) {
+        auto cur = Q.top();
+        Q.pop();
+        int u = cur.u;
+
+        // 旧记录无效时跳过，始终以 distance[u] 的最新值为准
+        if (cur.g != distance[u]) continue;
+        if (closed[u]) continue;
+        closed[u] = true;
+
+        // A* 的典型用法：一旦目标点出队，就可以结束
+        if (u == t) break;
+
+        for (const auto &e : edges[u]) {
+            int v = e.first;
+            int w = e.second;
+            if (distance[u] != INT_MAX && distance[v] > distance[u] + w) {
+                Relax(u, v, w, distance, parent);
+                Q.push({distance[v] + h[v], distance[v], v});
+            }
+        }
+    }
+}
+
+static void PrintPath(int s, int t, const vector<int>& parent) {
+    vector<int> path;
+    for (int cur = t; cur != -1; cur = parent[cur]) {
+        path.push_back(cur);
+        if (cur == s) break;
+    }
+    if (path.empty() || path.back() != s) {
+        cout << "未找到从源点到目标点的路径" << endl;
+        return;
+    }
+    reverse(path.begin(), path.end());
+    cout << "最短路径：";
+    for (size_t i = 0; i < path.size(); ++i) {
+        if (i) cout << " -> ";
+        cout << path[i];
+    }
+    cout << endl;
+}
+
+int main(){
+    int V, s, t;
+    int v, w;
+    string line;
+
+    // 输入格式：
+    // 第 1 行：V s t
+    // 接下来 V 行：每行是当前顶点的邻接表，格式为 v w v w ...
+    // 可选的最后 1 行：h[0] h[1] ... h[V-1]
+    cin >> V >> s >> t;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+    vector<vector<pair<int,int>>> edges(V);
+    for (int u = 0; u < V; ++u) {
+        if (!getline(cin, line)) break;
+        while (line.empty() && getline(cin, line)) {}
+        stringstream ss(line);
+        while (ss >> v >> w) {
+            edges[u].push_back({v, w});
+        }
+    }
+
+    vector<int> h(V, 0);
+    while (getline(cin, line)) {
+        if (!line.empty()) {
+            stringstream ss(line);
+            bool hasHeuristic = false;
+            for (int i = 0; i < V && (ss >> h[i]); ++i) {
+                hasHeuristic = true;
+            }
+            if (!hasHeuristic) {
+                fill(h.begin(), h.end(), 0);
+            }
+            break;
+        }
+    }
+
+    vector<int> distance(V, INT_MAX);
+    vector<int> parent(V, -1);
+    AStar(s, t, edges, h, distance, parent);
+
+    cout << "源点到目标点的最短距离：" << distance[t] << endl;
+    PrintPath(s, t, parent);
+    cout << "\n各点的 g 值（从源点到该点的真实距离）：" << endl;
+    for(int i=0;i<V;i++){
+        cout << i << " 从源结点到这的距离：" << distance[i] << " 父节点：" << parent[i] << endl;
+    }
+}
+```
+### Bidirectional Dijkstra 双向Dijkstra
+#### 伪代码
+```cpp
+BidirectionalDijkstra(G, s, t):
+    对所有点 v:
+        distF[v] = +∞, distB[v] = +∞
+        parentF[v] = NIL, parentB[v] = NIL
+        settledF[v] = false, settledB[v] = false
+
+    distF[s] = 0
+    distB[t] = 0
+
+    QF = min-priority-queue, 按 distF 排序
+    QB = min-priority-queue, 按 distB 排序
+    push (0, s) into QF
+    push (0, t) into QB
+
+    best = +∞
+    meet = NIL
+
+    while QF not empty and QB not empty:
+        if minKey(QF) + minKey(QB) >= best:
+            break
+
+        // 扩展当前更“便宜”的一侧
+        if minKey(QF) <= minKey(QB):
+            (d, u) = extract-min(QF)
+            if settledF[u]: continue
+            settledF[u] = true
+
+            if settledB[u] and distF[u] + distB[u] < best:
+                best = distF[u] + distB[u]
+                meet = u
+
+            for each edge (u, v, w) in G:
+                if distF[v] > distF[u] + w:
+                    distF[v] = distF[u] + w
+                    parentF[v] = u
+                    push (distF[v], v) into QF
+        else:
+            (d, u) = extract-min(QB)
+            if settledB[u]: continue
+            settledB[u] = true
+
+            if settledF[u] and distF[u] + distB[u] < best:
+                best = distF[u] + distB[u]
+                meet = u
+
+            for each reverse edge (u, v, w) in G^R:
+                if distB[v] > distB[u] + w:
+                    distB[v] = distB[u] + w
+                    parentB[v] = u
+                    push (distB[v], v) into QB
+
+    return best, path reconstructed from parentF and parentB via meet
+```
+
+当然也可以把“每次扩展哪一侧”改成“正向和反向交替扩展”。  
+但上面这种“扩展当前队头更小的一侧”更常见
+
+---
+#### 自然语言描述
+Bidirectional Dijkstra 的想法很简单：  
+不是只从起点 $s$ 往终点 $t$ 单向扩展，而是同时做两次 Dijkstra：
+
+- 正向搜索：从 $s$ 出发，在原图上跑 Dijkstra
+- 反向搜索：从 $t$ 出发，在反图上跑 Dijkstra
+
+两边都像“水波纹”一样往外扩展。  
+一旦两边在某个点相遇，就说明找到了若干条候选路径；再结合一个停止条件，就可以证明已经得到最短路。
+
+如果图是无向图，反向搜索和正向搜索在同一张图上跑即可。  
+如果图是有向图，反向搜索要在“反图”上跑，也就是边方向全部反过来。
+
+---
+
+**2. 算法运行步骤**
+
+设：
+
+- $distF[v]$：正向搜索中，$s \to v$ 的当前最短距离
+- $distB[v]$：反向搜索中，$v \to t$ 的当前最短距离
+- $QF$：正向优先队列
+- $QB$：反向优先队列
+- $best$：当前已知的最短候选路径长度，初始为 $\infty$
+
+步骤如下：
+
+1. 初始化  
+   - $distF[s] = 0$，把 $s$ 放入 $QF$
+   - $distB[t] = 0$，把 $t$ 放入 $QB$
+   - 其他点距离都设为 $\infty$
+   - $best = \infty$
+
+2. 循环扩展  
+   每次从两个队列中“更小的当前最小键”那一侧扩展，或者交替扩展都可以。  
+   对当前弹出的点做 Dijkstra 的松弛操作。
+
+3. 更新候选答案  
+   如果某个点 $v$ 同时已经被两边“看见”了，也就是：
+   - 正向知道 $distF[v]$
+   - 反向知道 $distB[v]$
+   
+   那么就可以得到一条合法路径：
+   $$s \to v \to t$$
+   其长度为：
+   $$distF[v] + distB[v]$$
+   
+   用它更新：
+   $$best = \min(best, distF[v] + distB[v])$$
+
+4. 停止条件  
+   当：
+   $$\min(QF) + \min(QB) \ge best$$
+   时停止。
+
+5. 输出答案  
+   最终 $best$ 就是最短路径长度。  
+   如果还要输出路径，就记录前驱数组 $parentF$ 和 $parentB$，在相遇点把两边路径拼起来。
+
+---
+
+
+#### 正确性证明
+
+我们要证明：算法返回的 `best` 就是从 $s$ 到 $t$ 的最短路长度。
+
+证明分三步。
+
+
+1. 单侧 Dijkstra 的结论仍然成立
+
+在正向搜索中，凡是从正向优先队列中弹出的点 $u$，`distF[u]` 就已经是从 $s$ 到 $u$ 的真实最短距离。
+
+反向搜索同理：凡是从反向优先队列中弹出的点 $u$，`distB[u]` 就已经是从 $u$ 到 $t$ 的真实最短距离。
+
+这个结论直接来自 Dijkstra 的正确性，因为边权非负。
+
+---
+
+2. `best` 始终是某条真实 $s \to t$ 路径长度的上界
+
+只要某个点 $v$ 同时被正向和反向确定了，我们就能拼出一条真实路径：
+
+$$
+s \to v \to t
+$$
+
+它的长度是
+
+$$
+distF[v] + distB[v]
+$$
+
+所以每次更新 `best` 都是在记录一条真实可行路径的长度。  
+因此 `best` 一直是当前已知最优答案的上界。
+
+---
+
+
+
+3. 停止条件保证“不会漏掉更短的路径”**
+
+设：
+
+- $f = \min(QF)$，即正向队列里当前最小的键
+- $b = \min(QB)$，即反向队列里当前最小的键
+
+现在假设还有一条更短的路径 $P$，它长度小于 `best`。  
+那这条路径不可能完全被两边已经“覆盖”了，否则它对应的某个相遇点就已经更新进 `best` 里了。
+
+因为边权非负，所以：
+
+- 从 $s$ 到任何还没被正向确定的点，代价都至少是 $f$
+- 从任何还没被反向确定的点到 $t$，代价都至少是 $b$
+
+于是，任何尚未被排除掉的 $s \to t$ 路径，其长度下界至少是：
+$$f + b$$
+
+如果此时已经有：
+$$f + b \ge best$$
+
+那么说明任何“还没完全被搜索到”的路径，都不可能比当前 `best` 更短。  
+所以 `best` 就是真正最短路，算法可以安全停止。
+
+---
+
+**直观的证明思路**
+
+1. 两边都在用 Dijkstra，所以每边弹出的点，其最短距离都已经定死了。
+2. 一旦某个点两边都“见过”了，就能拼出一条完整的 $s \to t$ 路径。
+3. `best` 记录的是目前找到的最短完整路径。
+4. 两个队列头部的最小值 `f` 和 `b` 表示：接下来如果还想从两边继续往中间挖，至少还要付出这么多代价。
+5. 当 `f + b >= best` 时，说明未来所有可能的新路径都不可能更短，所以可以停止。
+
+---
+
+**为什么这个算法比单向 Dijkstra更快**
+
+单向 Dijkstra 是从一边向外扩散，搜索范围会像圆一样慢慢变大。  
+双向 Dijkstra 是两边同时扩散，扩散半径大约减半，通常能显著减少访问点数。
+
+---
+### Contraction Hierarchies 收缩层级算法
+[CH算法参考](https://jlazarsfeld.github.io/ch.150.project/contents/)
+[Project-OSRM开源路径规划引擎](https://github.com/Project-OSRM/osrm-backend)
+有了Bidirectional Dijkstra的基础，我们可以学习Contraction Hierarchies收缩层级算法
+#### 原理概述
+- 收缩层级（Contraction Hierarchies, CH）是对静态路网做重预处理，使后续点对最短路查询非常快。  
+- **预处理**阶段逐个“收缩”顶点 v：在删去 v 之前，为保证任意最短路不受影响，若存在入边 (u→v) 与出边 (v→w) 且通过 v 的**最短路径 u→v→w 比不经过 v 的任何替代路径更短**，则在 u→w 之间加入一条“**shortcut**”边，权重为 dist(u,v)+dist(v,w)。同时为每个顶点分配一个**等级**（收缩顺序）。  
+- **查询阶段**只在“**上升**”方向（由低等级到高等级）搜索：从 s 做向上 Dijkstra（**只沿着指向更高等级的边**），从 t 做向上反向 Dijkstra（在反向图上也**只沿向更高等级的边**），两边在某些顶点相遇，**取代价最小**的组合即为最短路。  
+- 关键思想：通过添加 shortcuts，使得存在一条按**等级单调增加**的最短路径；**只搜索单调路径**就足够找出全局最短路，因而大幅缩小搜索空间。
+
+#### 预处理（收缩）——详细步骤
+1. **选择收缩顺序/优先级**：为每个节点计算一个**重要性**（degree、shortcuts数目估计、边差、层次等），按重要性从低到高依次收缩较不重要的节点，**重要性可用启发式估计**并在过程中动态更新。  
+常见的启发式函数有：
+>**$EdgeDifference = shortcuts-incomingedges-outgoingedges$**
+>也就是我们要收缩这个结点时，需要添加的$shortcut$数目再减去原来这个结点的入边和出边数，$EdgeDifference$越小越先被收缩
+>像**高速公路**，或者一些重要公路上的顶点，由于他们影响着很多点与点之间的最短路径，假设他们消失的话，**就得加上很多Shortcuts**，他们的Edge Difference也就会非常大，所以在预处理时这些重要的交通枢纽就会被分配一个较低的优先级
+
+不过需要注意的是，我们添加shortcut的顺序和数量并不影响最后最短路径结果的正确性，但我们可以通过重要度从低到高给结点排序，再依次收缩结点添加shortcut可以使添加的shortcut尽可能少，同时使得查询（双向Dijkstra搜索）的效率更高
+![添加了shortcut的图](../../assets/images/未命名1.jpg)
+![每个结点的层级](../../assets/images/未命名2.jpg)
+2. **收缩节点 v** 的过程（contraction(v)）：  
+   - 对每对入邻 u（u→v）和出邻 w（v→w）执行一次“**witness search**”：在当前图中搜索从 u 到 w 的最短距离，限制搜索深度或**代价上界为 dist(u,v)+dist(v,w)=L**。（你可以理解为在进行Bidirectional Dijkstra 搜索时如果存在$w(u,k)>L$则$w(u,k)+w(k,w)>L$可以不用再探索这一条路径）  
+   - 如果 witness search 找到的替代路径的代价 ≤ dist(u,v)+dist(v,w)，则说明**不需要添加 shortcut**（**存在不通过 v 的等价或更短路径**）。否则，说明u,w之间**不存在不经过v的最短路径**，**插入 shortcut 边 u→w**，权重 = dist(u,v)+dist(v,w)，并记录该 shortcut 为来自 v（便于路径展开）。  
+   - 标记 v 为已收缩，记录 **v 的层级**（收缩时间戳或 rank）。  
+   ![收缩1](../../assets/images/收缩1.jpg)
+   ![收缩2](../../assets/images/收缩2.jpg)
+   ![收缩3](../../assets/images/收缩3.jpg)
+3. **重复收缩**直到所有顶点被收缩。最终图包含原始边和大量 shortcuts，并且每条边都可以带有“产生者”或“中间节点”信息（用于路径还原）。注意这个我们在查询两个结点的最短路径路径时不会在最终图运行Dijkstra,而是在**Upward Graph**上，这个图里面的每条边上的两个点都是**从层级低指向高**，所有Upward Graph是一个有向无环图
+![upward_graph_from_B](../../assets/images/upward_graph_from_B.jpg)
+![upward_graph_from_B_2](../../assets/images/upward_graph_from_B_2.jpg)
+![upward_graph_from_G](../../assets/images/upward_graph_from_G.jpg)
+![upward_graph_from_G_2](../../assets/images/upward_graph_from_G_2.jpg)
+4. **Path unpacking**：生成 shortcut 时同时保留它所代表的中间节点（通常是 v），用于在查询后递归展开 shortcut 以恢复原始顶点序列。
+![最短路径](../../assets/images/最短路径.jpg)
+![最短路径还原](../../assets/images/最短路径还原.jpg)
+#### 查询（在线）——详细步骤
+1. 输入 s, t。准备两张数组 distF/distB（初始化为 +∞），和两个优先队列 QF（正向）、QB（反向）。  
+2. 将 distF[s]=0, push (0,s) 到 QF；将 distB[t]=0, push (0,t) 到 QB。best=+∞。  
+3. 正/反向交替或按队头键值较小者扩展（和双向 Dijkstra 类似），但只允许沿“向上边”扩展：一条有向边 x→y 仅在 rank(x) < rank(y) 时被视为“向上”；因此正向扩展考察所有从 u 出发且 rank(u) < rank(v) 的边，反向扩展在反图上同理。  
+4. 每当某个节点 v 被两边都访问到（两边 dist 不为 +∞），更新候选 best = min(best, distF[v]+distB[v])。  
+5. 停止条件与双向 Dijkstra 一样：当 minKey(QF) + minKey(QB) ≥ best 时停止。返回 best 和通过记录的 parentF/parentB 以及 shortcut unpacking 还原完整路径。
+
+#### 路径还原（unpacking） 
+- 查询得到 meet 节点 m（或多个可能的交汇点，选使 distF+distB 最小者）；从 s 到 m 的路径与从 t 到 m（反向） 的路径都可能包含 shortcut，递归将每条 shortcut 替换成其生成时记录的中间节点分割的两条边，直到只剩原始边为止，从而重建完整顶点序列。
+
+#### 正确性证明
+目的：证明在收缩并添加了 shortcuts 后，按 rank 单调上升的最短路径存在且在线查询会找到全局最短路。
+
+证明思路分几个引理：
+
+引理 1（收缩时 shortcut 保全最短路）：  
+- 当在收缩节点 v 时，对于任一入边 u→v 与出边 v→w，如果存在一条不经过 v 的路径 u→…→w 的长度 ≤ dist(u,v)+dist(v,w)，则 witness search 会发现该路径（或等价），不插入 shortcut；若不存在这样的路径，则插入 shortcut u→w，使得在收缩后的图中仍存在从 u 到 w 的一条长度等于原最短通过 v 的路径。  
+- 因此，对于任一被 v 参与的最短路径断点 u→v→w，在收缩后图中仍有至少一条等长路径连接 u 与 w（直接为 shortcut 或原路径仍存在）。**由此收缩不会丢失任一原最短路径的长度信息。**
+
+引理 2（存在单调路径）：  
+- 对原图中任一最短路径 P = s = x0 → x1 → … → xk = t，考虑收缩顺序（每个节点有一个 rank）。把 P 上节点按**收缩时间排序**（rank），在逐步收缩所有节点后，可构造一条路径 P' 在收缩图中，其经过节点满足 rank 单调递增（或非递减），并且长度与 P 相同。（证明：递归地用 shortcut 替代每个被收缩的内部节点；由引理1，替换保持等长，最终得到只沿向上边行走的路径。）  
+- 因此任何原图最短路径都**有等长的“单调（upward）”替代路径存在于 CH 图**
+
+引理 3（查询能找到单调最短路径）：  
+- **查询算法仅在向上边上进行正/反向搜索**，等价于只在单调路径空间中寻找路径。由引理2，存在一条等长的单调最短路径 P'，因此查询不会错过最短距离值。当正/反向搜索的相遇点满足 distF+distB = length(P') 时，best 会被更新为真实最短值。**停止条件保证最终得到的 best 是全局最短距离**（和双向 Dijkstra 的证明类似）。
+#### 局限
+当然Contraction Hierarchies也有自己的局限，因为预处理需要进行大量单源最短路径查询，所以当这个算法被应用在结点和边数都很庞大的图上（比如某个国家的道路网或者国际道路网）时，就需要大量时间。因此，一般的现代导航工具会提前对每个结点进行收缩，等到用户实际查询两结点间最短路径时再在Upward Graph上运行Bidirectional Dijkstra，此时由于Upward Graph相比原来的图，由于添加了shortcuts,大大减少了查询过程中经过的结点和边。但是，一旦出现了道路封锁和交通事故等等原因，导致图中边或者结点的变动，Contraction Hierarchies很可能返回错误的最短路径（如果还要坚持用Contraction Hierarchies求得最优路径的话，就需要重新预处理这样的开销太大了）
