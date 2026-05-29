@@ -1,5 +1,5 @@
 ---
-publishDate: 2026-05-18T00:00:00Z
+publishDate: 2026-05-29T00:00:00Z
 title: '多源最短路径'
 excerpt: '算法导论第25章'
 image: '../../assets/images/pagecover2.jpg'
@@ -28,7 +28,7 @@ $$
 $$
 E_{\pi,i}=\{(\pi_{ij},j):j\in V_{\pi,i}-\{i\}\}
 $$
-```
+```cpp
 print_all_pairs_shortest_path(PI,i,j)
 if i==j
     print i
@@ -91,7 +91,7 @@ $$
 \delta(i,j)=l_{ik}^{(n-1)}=l_{ik}^{(n)}=l_{ik}^{(n+1)}=...
 $$
 ### 伪代码(只涉及$L$和上一轮$L'$的递推关系，至于怎么快速求得$L^{(n-1)}$需要用重复平方)
-```
+```cpp
 extend_shortest_paths(L,W)
 n=L.rows
 let L'=(L_{ij}')be a new n*n matrix
@@ -110,11 +110,17 @@ $c_{ij}=\sum\limits_{k=1}^{n}a_{ik}\cdot b_{kj}$
 书上的算法：
 $l_{ij}^{(m)}=\min\limits_{1\le k \le n}\{l_{ik}^{(m-1)}+w_{kj}\}$
 书上也提到这种算法和矩阵乘法很像，对于这个算法里进行的所有运算都可以一一映射到矩阵乘法中的运算：
+
 $ l^{m-1} \to a $
+
 $ w\to b$
+
 $ l^{m} \to c$
+
 $min \to +$
+
 $ + \to \cdot $
+
 那这是不是意味着这种算法也满足矩阵乘法的一些基本定律呢？
 比如说结合律？
 答案是这种算法也满足结合律，有了这条性质，加上我们之前已经验证过的性质
@@ -145,7 +151,7 @@ $$
 当$2m > n-1$时$L^{(2m)} = L^{(n-1)}$
 最少经过$\lceil log_{2}^{n-1} \rceil$次平方达到$L^{(n-1)}$
 ### 伪代码(没有重复平方版)
-```
+```cpp
 slow_all_pairs_shortest_paths(W)
 n=W.rows
 L^{(1)}=W
@@ -156,7 +162,7 @@ return L^{(n-1)}
 ```
 时间复杂度：$O(n^{4})$
 ### 伪代码(重复平方优化)
-```
+```cpp
 faster_all_pairs_shortest_paths(W)
 n=W.rows
 L^{(1)}=W
@@ -291,7 +297,7 @@ w_{ij}, & \text{if } k = 0 \\[4pt]
 $$
 因为对于所有路径来说，所有的中间结点都属于集合$\{1,2,...,n\}$，所以矩阵$D^{(n)}=(d_{ij}^{(n)})$就是我们需要求出的最后答案
 ### 伪代码
-```
+```cpp
 floyd-warshall(W)
 n=W.rows
 D^(0)=W
@@ -500,7 +506,7 @@ $$
 h(v)\leq h(u)+w(u,v)$ , 因此 
 $\hat{w}(u,v)=w(u,v)+h(u)-h(v)\geq 0$,满足性质二
 ### Johnson伪代码
-```
+```cpp
 Johnson(G,w)
 compute G',where G'.V=G.V and {s},G'.E=G.E and {(s,v):v in G.V},w(s,v)=0 for all v in G.V
 if Bellman-Ford(G',w,s)==False
@@ -667,7 +673,7 @@ $$
 \hat{w}(u,v)=w(u,v)+h(v)-h(u)
 $$
 一种对于函数$h$的有趣理解是它代表了一个结点的“势能”，因为我们从$u$“下山”，“势能”减少$h(u)$,随后我们从$v$又上山,“势能”增加$h(v)$
-
+![势能](../../assets/images/A*.jpg)
 如果我们设一条路径$p=<v_{0},v_{1},...,v_{k}>$为$v_0$到$v_k$的一条最短路径，
 $$
 \hat{w}(p)=w(p)+h(v_{k})-h(v_{0})
@@ -1013,7 +1019,7 @@ $$
 
 
 
-3. 停止条件保证“不会漏掉更短的路径”**
+3. 停止条件保证“不会漏掉更短的路径”
 
 设：
 
@@ -1057,7 +1063,9 @@ $$f + b \ge best$$
 ---
 ### Contraction Hierarchies 收缩层级算法
 [CH算法参考](https://jlazarsfeld.github.io/ch.150.project/contents/)
+
 [Project-OSRM开源路径规划引擎](https://github.com/Project-OSRM/osrm-backend)
+
 有了Bidirectional Dijkstra的基础，我们可以学习Contraction Hierarchies收缩层级算法
 #### 原理概述
 - 收缩层级（Contraction Hierarchies, CH）是对静态路网做重预处理，使后续点对最短路查询非常快。  
@@ -1082,7 +1090,7 @@ $$f + b \ge best$$
    ![收缩1](../../assets/images/收缩1.jpg)
    ![收缩2](../../assets/images/收缩2.jpg)
    ![收缩3](../../assets/images/收缩3.jpg)
-3. **重复收缩**直到所有顶点被收缩。最终图包含原始边和大量 shortcuts，并且每条边都可以带有“产生者”或“中间节点”信息（用于路径还原）。注意这个我们在查询两个结点的最短路径路径时不会在最终图运行Dijkstra,而是在**Upward Graph**上，这个图里面的每条边上的两个点都是**从层级低指向高**，所有Upward Graph是一个有向无环图
+3. 对所有结点进行**重复收缩**。最终图包含原始边和大量 shortcuts，并且每条边都可以带有“产生者”或“中间节点”信息（用于路径还原）。注意这个我们在查询两个结点的最短路径路径时不会在最终图运行Dijkstra,而是在**Upward Graph**上，这个图里面的每条边上的两个点都是**从层级低指向高**，所有Upward Graph是一个有向无环图
 ![upward_graph_from_B](../../assets/images/upward_graph_from_B.jpg)
 ![upward_graph_from_B_2](../../assets/images/upward_graph_from_B_2.jpg)
 ![upward_graph_from_G](../../assets/images/upward_graph_from_G.jpg)
