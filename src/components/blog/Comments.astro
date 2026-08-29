@@ -1,0 +1,59 @@
+---
+const repository = 'yuhaixin0924/website';
+const repositoryId = 'R_kgDOShbC0Q';
+const category = 'Announcements';
+const categoryId = 'DIC_kwDOShbC0c4DEbRG';
+---
+
+<section class="mx-auto max-w-4xl px-4 pb-12 sm:px-6" aria-labelledby="comments-title">
+  <div class="border-t border-slate-200 pt-10 dark:border-slate-700">
+    <h2 id="comments-title" class="text-2xl font-bold text-slate-900 dark:text-white">留言</h2>
+    <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">
+      留言由 GitHub Discussions 提供，需要登录 GitHub。请友善交流，不要公开个人隐私。
+    </p>
+
+    {
+      (
+        <div
+          class="mt-6 min-h-32"
+          data-giscus-container
+          data-repo={repository}
+          data-repo-id={repositoryId}
+          data-category={category}
+          data-category-id={categoryId}
+        />
+      )
+    }
+  </div>
+</section>
+
+<script>
+  const container = document.querySelector<HTMLElement>('[data-giscus-container]');
+
+  if (container) {
+    const getTheme = () => (document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    const script = document.createElement('script');
+
+    script.src = 'https://giscus.app/client.js';
+    script.async = true;
+    script.crossOrigin = 'anonymous';
+    script.setAttribute('data-repo', container.dataset.repo || '');
+    script.setAttribute('data-repo-id', container.dataset.repoId || '');
+    script.setAttribute('data-category', container.dataset.category || 'General');
+    script.setAttribute('data-category-id', container.dataset.categoryId || '');
+    script.setAttribute('data-mapping', 'pathname');
+    script.setAttribute('data-strict', '1');
+    script.setAttribute('data-reactions-enabled', '1');
+    script.setAttribute('data-emit-metadata', '0');
+    script.setAttribute('data-input-position', 'top');
+    script.setAttribute('data-theme', getTheme());
+    script.setAttribute('data-lang', 'zh-CN');
+    script.setAttribute('data-loading', 'lazy');
+    container.appendChild(script);
+
+    new MutationObserver(() => {
+      const iframe = document.querySelector<HTMLIFrameElement>('iframe.giscus-frame');
+      iframe?.contentWindow?.postMessage({ giscus: { setConfig: { theme: getTheme() } } }, 'https://giscus.app');
+    }).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+  }
+</script>

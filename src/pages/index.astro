@@ -6,8 +6,8 @@ import FAQs from '~/components/widgets/FAQs.astro';
 import CallToAction from '~/components/widgets/CallToAction.astro';
 
 const metadata = {
-  title: 'brokenvase的学习笔记',
-  subtitle:'一个计算机专业在读学生，记录算法导论、数据结构和编程学习过程',
+  title: 'brokenvase 的学习笔记',
+  description: '记录算法导论、数据结构、数学与计算机基础的个人学习博客。',
   ignoreTitleTemplate: true,
 };
 ---
@@ -24,65 +24,44 @@ const metadata = {
       },
       { text: '关于我', href: '/about' },
     ]}
-    image={{ src: '~/assets/images/hero-image.jpg', alt: 'AstroWind Hero Image' }}
+    image={{ src: '~/assets/images/hero-image.jpg', alt: 'brokenvase 的学习笔记' }}
   >
-    <Fragment slot="title">
-      Welcome to my website 
-    </Fragment>
+    <Fragment slot="title"> brokenvase 的学习笔记 </Fragment>
 
-    <Fragment slot="subtitle">
-      <span class="hidden sm:inline">
-        created by template for Astro v6 +
-        Tailwind CSS v4.</span>
-      <span class="block mb-1 sm:hidden font-bold text-blue-600">AstroWind: Production-ready.</span>
-    </Fragment>
+    <Fragment slot="subtitle"> 记录算法导论、数据结构、数学与计算机基础的个人学习博客。 </Fragment>
   </Hero>
 
   <!-- Note Widget ******************* -->
 
-
-
   <!-- Features Widget *************** -->
 
-  
+  <!-- Content Widget **************** -->
 
   <!-- Content Widget **************** -->
 
-  
-  <!-- Content Widget **************** -->
-
-  
   <!-- Steps Widget ****************** -->
-
-  
 
   <!-- Features2 Widget ************** -->
 
-
   <!-- HighlightedPosts Widget ******* -->
 
-  <BlogLatestPosts
-    title="Find out more content in my Blog"
-  />
+  <BlogLatestPosts title="最近文章" linkText="查看全部文章" />
 
   <!-- FAQs Widget ******************* -->
 
   <FAQs
-    title="Questions and Answers "
-    tagline="Q&A"
+    title="关于这个博客"
+    tagline="学习记录"
     classes={{ container: 'max-w-6xl' }}
     items={[
       {
-        title: '为什么我搭建了这个博客?',
-        description:
-          "作为一个计算机小白，记录算法导论学习内容，同时激励自己多接触计算机网络和算法相关知识",
+        title: '为什么搭建这个博客？',
+        description: '记录算法导论的学习内容，同时激励自己继续学习计算机网络、数据结构和算法相关知识。',
       },
     ]}
   />
 
   <!-- Stats Widget ****************** -->
-
-  
 
   <!-- CallToAction Widget *********** -->
 
@@ -90,16 +69,13 @@ const metadata = {
     actions={[
       {
         variant: 'primary',
-        text: 'Get source code',
+        text: '在 GitHub 查看源码',
         href: 'https://github.com/yuhaixin0924/website',
         target: '_blank',
         icon: 'tabler:download',
       },
     ]}
   >
-
-    <Fragment slot="title">
-      查看本站源码:P
-    </Fragment>
+    <Fragment slot="title"> 本站代码公开在 GitHub </Fragment>
   </CallToAction>
 </Layout>

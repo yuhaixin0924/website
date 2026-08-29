@@ -1,7 +1,7 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import { defineConfig, fontProviders } from 'astro/config';
+import { defineConfig } from 'astro/config';
 
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
@@ -26,45 +26,12 @@ const whenExternalScripts = (items: (() => AstroIntegration) | (() => AstroInteg
 export default defineConfig({
   output: 'static',
 
-  fonts: [
-    {
-      provider: fontProviders.local(),
-      name: 'Atkinson',
-      cssVariable: '--font-atkinson',
-      options: {
-        variants: [
-          {
-            weight: 400,
-            style: 'normal',
-            src: ['./src/assets/fonts/atkinson-regular.woff'],
-          },
-          {
-            weight: 700,
-            style: 'normal',
-            src: ['./src/assets/fonts/atkinson-bold.woff'],
-          },
-        ],
-      },
-    },
-  ],
-
   integrations: [
     sitemap(),
     mdx(),
     icon({
       include: {
         tabler: ['*'],
-        'flat-color-icons': [
-          'template',
-          'gallery',
-          'approval',
-          'document',
-          'advertising',
-          'currency-exchange',
-          'voice-presentation',
-          'business-contact',
-          'database',
-        ],
       },
     }),
 

@@ -3,6 +3,9 @@ publishDate: 2026-05-18T00:00:00Z
 title: '最小生成树'
 excerpt: '我的第一篇文章。'
 image: '../../assets/blog-pagecover.jpg'
+category: '算法导论'
+tags: ['图算法', '最小生成树']
+author: 'brokenvase'
 ---
 # 最小生成树
 ## 23.1 最小生成树的形成
@@ -554,8 +557,7 @@ int main(){
     }
 }
 ```
-vibe coding 制作的一个网页：
-[迷宫生成可视化](http://tuchuang.brokenvase.top/picture/%E6%9C%AA%E5%91%BD%E5%90%8D.html)   
+vibe coding 制作的迷宫生成可视化网页（原演示链接已失效，暂不提供）。
 #### 最小生成树在图像分割/聚类上的应用
 运用kruskal算法实现，但是每次选边的时候还要通过比较intensity_difference和weight的结果决定是否把边加入最小生成树，intensity_difference函数可以评估两个连通分量的差异度，避免将两个差异度过大的树（聚类）相连
 ```cpp
@@ -927,5 +929,3 @@ int main(){
     return 0;
 }
 ```
-
-

@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import 'tailwindcss' source('../..');
 @import 'katex/dist/katex.min.css';
 
 @plugin "@tailwindcss/typography";

@@ -1,302 +1,132 @@
-# 🚀 AstroWind
+# brokenvase 的学习笔记
 
-<img src="https://raw.githubusercontent.com/arthelokyo/.github/main/resources/astrowind/lighthouse-score.png" align="right"
-     alt="AstroWind Lighthouse Score" width="100" height="358">
+记录算法导论、数据结构、数学与计算机基础的个人学习博客。
 
-🌟 _Most *starred* & *forked* Astro theme in 2022, 2023, 2024 & 2025_. 🌟
+项目使用 Astro 6、TypeScript 和 Tailwind CSS 4 构建。目前以静态网站方式运行，并部署到 Vercel；正式域名为 `https://www.brokenvase.top`。
 
-**AstroWind** is a free and open-source template to make your website using **[Astro v6](https://astro.build/) + [Tailwind CSS v4](https://tailwindcss.com/)**. Ready to start a new project and designed taking into account web best practices.
+## 开始使用
 
-- ✅ **Production-ready** scores in **PageSpeed Insights** reports.
-- ✅ Integration with **Tailwind CSS v4** supporting **Dark mode** and **_RTL_**.
-- ✅ **Fast and SEO friendly blog** with automatic **RSS feed**, **MDX** support, **Categories & Tags**, **Social Share**, ...
-- ✅ **Image Optimization** (using new **Astro Assets** and **Unpic** for Universal image CDN).
-- ✅ Generation of **project sitemap** based on your routes.
-- ✅ **Open Graph tags** for social media sharing.
-- ✅ **Analytics** built-in Google Analytics, and Splitbee integration.
+需要 Node.js 22.12 或更高版本。
 
-<br>
-
-![AstroWind Theme Screenshot](https://raw.githubusercontent.com/arthelokyo/.github/main/resources/astrowind/screenshot-astrowind-readme-fina-v1.png)
-
-[![arthelokyo](https://custom-icon-badges.demolab.com/badge/made%20by%20-arthelokyo-556bf2?style=flat-square&logo=arthelokyo&logoColor=white&labelColor=101827)](https://github.com/arthelokyo)
-[![License](https://img.shields.io/github/license/arthelokyo/astrowind?style=flat-square&color=dddddd&labelColor=000000)](https://github.com/arthelokyo/astrowind/blob/main/LICENSE.md)
-[![Maintained](https://img.shields.io/badge/maintained%3F-yes-brightgreen.svg?style=flat-square)](https://github.com/arthelokyo)
-[![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat-square)](https://github.com/arthelokyo/astrowind#contributing)
-[![Known Vulnerabilities](https://snyk.io/test/github/arthelokyo/astrowind/badge.svg?style=flat-square)](https://snyk.io/test/github/arthelokyo/astrowind)
-[![Stars](https://img.shields.io/github/stars/arthelokyo/astrowind.svg?style=social&label=stars&maxAge=86400&color=ff69b4)](https://github.com/arthelokyo/astrowind)
-[![Forks](https://img.shields.io/github/forks/arthelokyo/astrowind.svg?style=social&label=forks&maxAge=86400&color=ff69b4)](https://github.com/arthelokyo/astrowind)
-
-<br>
-
-<details open>
-<summary>Table of Contents</summary>
-
-- [Demo](#demo)
-- [Upcoming: AstroWind 2.0 – We Need Your Vision!](#-upcoming-astrowind-20--we-need-your-vision)
-- [TL;DR](#tldr)
-- [Getting started](#getting-started)
-  - [Project structure](#project-structure)
-  - [Commands](#commands)
-  - [Configuration](#configuration)
-  - [Deploy](#deploy)
-- [Frequently Asked Questions](#frequently-asked-questions)
-- [Contributing](#contributing)
-- [Acknowledgements](#acknowledgements)
-- [License](#license)
-
-</details>
-
-<br>
-
-## Demo
-
-📌 [https://astrowind.vercel.app/](https://astrowind.vercel.app/)
-
-<br>
-
-## 🔔 Upcoming: AstroWind 2.0 – We Need Your Vision!
-
-We're gearing up for **AstroWind 2.0**, and we want it to be shaped by you, our community. Join the discussion and share your ideas, suggestions, and feedback to help us make AstroWind even better.
-
-[Share Your Feedback in Our Discussion!](https://github.com/arthelokyo/astrowind/discussions/392)
-
-<br>
-
-## TL;DR
-
-```shell
-npm create astro@latest -- --template arthelokyo/astrowind
+```bash
+npm install
+npm run dev
 ```
 
-## Getting started
+开发服务器默认地址为 `http://localhost:4321`。
 
-**AstroWind** tries to give you quick access to creating a website using [Astro v6](https://astro.build/) + [Tailwind CSS v4](https://tailwindcss.com/). It's a free theme which focuses on simplicity, good practices and high performance.
-
-Very little vanilla javascript is used only to provide basic functionality so that each developer decides which framework (React, Vue, Svelte, Solid JS...) to use and how to approach their goals.
-
-> **Note:** Requires **Node.js >= 22.12.0**. The template currently uses `output: 'static'`, but the blog only works with `prerender = true`.
-
-### Project structure
-
-Inside **AstroWind** template, you'll see the following folders and files:
-
+```bash
+npm run check    # 类型、代码规范和格式检查
+npm run build    # 生成正式网站到 dist/
+npm run preview  # 在本地预览正式构建
+npm run fix      # 自动修复可修复的格式和代码规范问题
 ```
-/
-├── public/
-│   ├── _headers
-│   └── robots.txt
+
+## 项目结构
+
+```text
+.
+├── api/                    # Vercel Functions 后端接口
+├── public/                 # 原样复制到网站根目录的静态文件
 ├── src/
-│   ├── assets/
-│   │   ├── favicons/
-│   │   ├── images/
-│   │   └── styles/
-│   │       └── tailwind.css
-│   ├── components/
-│   │   ├── blog/
-│   │   ├── common/
-│   │   ├── ui/
-│   │   ├── widgets/
-│   │   │   ├── Header.astro
-│   │   │   └── ...
-│   │   ├── CustomStyles.astro
-│   │   ├── Favicons.astro
-│   │   └── Logo.astro
-│   ├── content.config.ts
-│   ├── data/
-│   │   └── post/
-│   │       ├── post-slug-1.md
-│   │       ├── post-slug-2.mdx
-│   │       └── ...
-│   ├── layouts/
-│   │   ├── Layout.astro
-│   │   ├── MarkdownLayout.astro
-│   │   └── PageLayout.astro
-│   ├── pages/
-│   │   ├── [...blog]/
-│   │   │   ├── [category]/
-│   │   │   ├── [tag]/
-│   │   │   ├── [...page].astro
-│   │   │   └── index.astro
-│   │   ├── index.astro
-│   │   ├── 404.astro
-│   │   ├-- rss.xml.ts
-│   │   └── ...
-│   ├── utils/
-│   ├── config.yaml
-│   └── navigation.js
-├── package.json
-├── astro.config.ts
-└── ...
+│   ├── assets/             # 会经过 Astro 优化的图片、样式和站内资源
+│   ├── components/         # 页面复用组件
+│   │   ├── blog/           # 文章列表、文章正文、标签、分页
+│   │   ├── common/         # SEO、主题切换、图片、分享等通用功能
+│   │   ├── ui/             # 按钮、标题、内容容器等基础组件
+│   │   └── widgets/        # 页头、页脚、首页区块
+│   ├── data/post/          # Markdown / MDX 博客文章
+│   ├── layouts/            # 全站、普通页面和文章页面布局
+│   ├── pages/              # 文件路由；文件路径决定网页地址
+│   ├── utils/              # 文章读取、链接、图片和 frontmatter 工具
+│   ├── config.yaml         # 站名、域名、语言、SEO、博客规则等核心配置
+│   ├── content.config.ts   # 文章集合及 frontmatter 字段规则
+│   └── navigation.ts       # 顶部导航、页脚和公开社交链接
+├── vendor/integration/     # 读取 config.yaml 的 AstroWind 配置集成
+├── astro.config.ts         # Astro、MDX、Tailwind、站点地图和图片配置
+├── vercel.json             # Vercel 路由与缓存响应头配置
+├── package.json            # 依赖、Node.js 版本和 npm 命令
+├── tsconfig.json           # TypeScript 和 `~/` 路径别名配置
+└── .github/workflows/      # GitHub 推送或 PR 时执行构建和检查
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+以下目录由工具生成或仅用于本地恢复，不应手动编辑，也不会部署：
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+- `node_modules/`、`node_modules.nosync/`：本地安装的依赖。
+- `.astro/`：Astro 开发缓存和类型文件。
+- `dist/`：`npm run build` 生成的网站成品。
+- `_local-archive/`、`local-backups/`：工程整理前的本地备份。
 
-Any static assets, like images, can be placed in the `public/` directory if they do not require any transformation or in the `assets/` directory if they are imported directly.
+## 页面和网址
 
-[![Edit AstroWind on CodeSandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://githubbox.com/arthelokyo/astrowind/tree/main) [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/arthelokyo/astrowind)
+| 源文件                                | 网站地址        | 作用                   |
+| ------------------------------------- | --------------- | ---------------------- |
+| `src/pages/index.astro`               | `/`             | 首页                   |
+| `src/pages/about.astro`               | `/about`        | 关于我资料卡           |
+| `src/pages/contact.astro`             | `/contact`      | 联系表单               |
+| `src/pages/[...blog]/[...page].astro` | `/blog`         | 文章列表与分页         |
+| `src/pages/[...blog]/index.astro`     | 文章固定链接    | 文章正文               |
+| `src/pages/[...blog]/category/`       | `/category/...` | 分类页                 |
+| `src/pages/[...blog]/tag/`            | `/tag/...`      | 标签页                 |
+| `src/pages/rss.xml.ts`                | `/rss.xml`      | RSS 订阅源             |
+| `src/pages/404.astro`                 | `/404`          | 找不到页面时显示的内容 |
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file `README.md`. Update `src/config.yaml` and contents. Have fun!
+## 写一篇文章
 
-<br>
-
-### Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command             | Action                                             |
-| :------------------ | :------------------------------------------------- |
-| `npm install`       | Installs dependencies                              |
-| `npm run dev`       | Starts local dev server at `localhost:4321`        |
-| `npm run build`     | Build your production site to `./dist/`            |
-| `npm run preview`   | Preview your build locally, before deploying       |
-| `npm run check`     | Check your project for errors                      |
-| `npm run fix`       | Run Eslint and format codes with Prettier          |
-| `npm run astro ...` | Run CLI commands like `astro add`, `astro preview` |
-
-<br>
-
-### Configuration
-
-Basic configuration file: `./src/config.yaml`
+在 `src/data/post/` 新建 `.md` 或 `.mdx` 文件。常用 frontmatter 示例：
 
 ```yaml
-site:
-  name: 'Example'
-  site: 'https://example.com'
-  base: '/' # Change this if you need to deploy to Github Pages, for example
-  trailingSlash: false # Generate permalinks with or without "/" at the end
-
-  googleSiteVerificationId: false # Or some value,
-
-# Default SEO metadata
-metadata:
-  title:
-    default: 'Example'
-    template: '%s — Example'
-  description: 'This is the default meta description of Example website'
-  robots:
-    index: true
-    follow: true
-  openGraph:
-    site_name: 'Example'
-    images:
-      - url: '~/assets/images/default.png'
-        width: 1200
-        height: 628
-    type: website
-  twitter:
-    handle: '@twitter_user'
-    site: '@twitter_user'
-    cardType: summary_large_image
-
-i18n:
-  language: en
-  textDirection: ltr
-
-apps:
-  blog:
-    isEnabled: true # If the blog will be enabled
-    postsPerPage: 6 # Number of posts per page
-
-    post:
-      isEnabled: true
-      permalink: '/blog/%slug%' # Variables: %slug%, %year%, %month%, %day%, %hour%, %minute%, %second%, %category%
-      robots:
-        index: true
-
-    list:
-      isEnabled: true
-      pathname: 'blog' # Blog main path, you can change this to "articles" (/articles)
-      robots:
-        index: true
-
-    category:
-      isEnabled: true
-      pathname: 'category' # Category main path /category/some-category, you can change this to "group" (/group/some-category)
-      robots:
-        index: true
-
-    tag:
-      isEnabled: true
-      pathname: 'tag' # Tag main path /tag/some-tag, you can change this to "topics" (/topics/some-category)
-      robots:
-        index: false
-
-    isRelatedPostsEnabled: true # If a widget with related posts is to be displayed below each post
-    relatedPostsCount: 4 # Number of related posts to display
-
-analytics:
-  vendors:
-    googleAnalytics:
-      id: null # or "G-XXXXXXXXXX"
-
-ui:
-  theme: 'system' # Values: "system" | "light" | "dark" | "light:only" | "dark:only"
+---
+title: '文章标题'
+publishDate: 2026-08-27
+excerpt: '文章摘要'
+image: '../../assets/images/cover.jpg'
+category: '数据结构'
+tags: ['CSAPP', '学习笔记']
+author: 'brokenvase'
+draft: false
+---
 ```
 
-<br>
+文章使用的图片建议放在 `src/assets/images/`，Astro 会在构建时压缩并生成适合浏览器的格式。头像文件是 `src/assets/images/avatar.jpg`；当前 Logo 是 `public/logo.jpg`。
 
-#### Customize Design
+## 配置与部署
 
-With Tailwind CSS v4, all configuration is CSS-first. To customize Font families, Colors or more Elements refer to the following files:
+- 网站名称、描述、正式域名和 SEO：`src/config.yaml`
+- 导航和 GitHub 链接：`src/navigation.ts`
+- Vercel 构建命令：`npm run build`
+- Vercel 输出目录：`dist`
+- DNS 与外层 CDN：Cloudflare
+- 网站托管：Vercel
 
-- `src/components/CustomStyles.astro` — CSS variables for colors and fonts
-- `src/assets/styles/tailwind.css` — Tailwind theme tokens (`@theme`), custom utilities (`@utility`), and plugins
+Vercel 会自动提供 HTTPS 证书并续期；域名正确连接到 Vercel 后，不需要自行购买或上传证书。
 
-### Deploy
+## 留言与联系表单
 
-#### Deploy to production (manual)
+文章留言使用 Giscus，数据保存在 GitHub Discussions，不需要数据库。联系表单通过 `api/contact.ts` 调用 Resend，收件地址仅保存在 Vercel 环境变量中，不会写入仓库。
 
-You can create an optimized production build with:
+### Giscus 留言
 
-```shell
-npm run build
+GitHub Discussions 与 Giscus 应用均已启用。留言使用 `Announcements` 分类，并按文章路径分别建立 Discussion；仓库名、仓库 ID 与分类 ID 均已写入 `src/components/blog/Comments.astro`，不需要在 Vercel 中配置留言相关环境变量。访客需要登录 GitHub 才能留言，你可以直接在仓库的 Discussions 页面管理内容。
+
+### 启用联系邮件
+
+1. 注册 Resend，并添加发送域名 `brokenvase.top`。
+2. 按 Resend 提示在 Cloudflare DNS 中添加 SPF、DKIM 等验证记录。
+3. 在 Resend 创建 API Key。
+4. 在 Vercel 项目中添加以下环境变量：
+
+```text
+RESEND_API_KEY=Resend 生成的密钥
+CONTACT_TO_EMAIL=你的收件邮箱
+CONTACT_FROM_EMAIL=brokenvase 的学习笔记 <contact@brokenvase.top>
 ```
 
-Now, your website is ready to be deployed. All generated files are located at
-`dist` folder, which you can deploy the folder to any hosting service you
-prefer.
+不要把真实密钥或私人邮箱提交到 Git；本地测试时应填写在被 Git 忽略的 `.env` 中。
 
-#### Deploy to Netlify
+## 尚待替换的品牌资源
 
-Clone this repository on your own GitHub account and deploy it to Netlify:
+- 新 Logo：替换 `public/logo.jpg`，建议使用正方形 PNG、WebP 或 JPG。
+- 默认分享封面：建议使用 1200 × 630 图片，放入 `src/assets/images/` 后在 `src/config.yaml` 的 `metadata.openGraph.images` 中启用。
 
-[![Netlify Deploy button](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/arthelokyo/astrowind)
-
-#### Deploy to Vercel
-
-Clone this repository on your own GitHub account and deploy to Vercel:
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Farthelokyo%2Fastrowind)
-
-#### Deploy to PandaStack
-
-Clone this repository on your own GitHub account and deploy to PandaStack:
-
-[![Deploy to PandaStack](https://dashboard.pandastack.io/deploy-button.svg)](https://dashboard.pandastack.io/deploy?repo=arthelokyo/astrowind&type=static&buildCmd=npm+run+build&outputDir=dist)
-
-<br>
-
-## Frequently Asked Questions
-
-- Why?
--
--
-
-<br>
-
-## Contributing
-
-If you have any ideas, suggestions or find any bugs, feel free to open a discussion, an issue or create a pull request.
-That would be very useful for all of us and we would be happy to listen and take action.
-
-## Acknowledgements
-
-Initially created by **Arthelokyo** and maintained by a community of [contributors](https://github.com/arthelokyo/astrowind/graphs/contributors).
-
-## License
-
-**AstroWind** is licensed under the MIT license — see the [LICENSE](./LICENSE.md) file for details.
+在分享封面提供前，网站不会使用 AstroWind 模板的默认社交图片。

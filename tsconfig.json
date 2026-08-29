@@ -10,5 +10,5 @@
     }
   },
   "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist/"]
+  "exclude": ["dist/", "node_modules/", "node_modules.nosync/", "_local-archive/", "local-backups/"]
 }

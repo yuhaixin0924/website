@@ -3,6 +3,9 @@ publishDate: 2026-05-29T00:00:00Z
 title: '多源最短路径'
 excerpt: '算法导论第25章'
 image: '../../assets/images/pagecover2.jpg'
+category: '算法导论'
+tags: ['图算法', '最短路径']
+author: 'brokenvase'
 ---
 # 多源最短路径
 ## 图的基本表示方法

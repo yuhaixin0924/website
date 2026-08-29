@@ -1,9 +1,15 @@
 # build output
 dist/
 .output/
+coverage/
+
+# local deployment metadata
+.vercel/
 
 # dependencies
 node_modules/
+node_modules
+node_modules.nosync/
 
 # logs
 npm-debug.log*
@@ -14,7 +20,7 @@ pnpm-debug.log*
 
 # environment variables
 .env
-.env.production
+.env.*
 
 # macOS-specific files
 .DS_Store
@@ -22,3 +28,8 @@ pnpm-debug.log*
 pnpm-lock.yaml
 
 .astro
+*.tsbuildinfo
+
+# 合并前的本地工程副本，仅用于恢复，不参与部署
+_local-archive/
+local-backups/

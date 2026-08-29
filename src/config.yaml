@@ -1,5 +1,5 @@
 site:
-  name: brokenvase
+  name: 'brokenvase 的学习笔记'
   site: 'https://www.brokenvase.top'
   base: '/'
   trailingSlash: false
@@ -9,26 +9,18 @@ site:
 # Default SEO metadata
 metadata:
   title:
-    default: brokenvase
-    template: '%s — brokenvase'
-  description: "\U0001F680 Suitable for Startups, Small Business, Sass Websites, Professional Portfolios, Marketing Websites, Landing Pages & Blogs."
+    default: 'brokenvase 的学习笔记'
+    template: '%s — brokenvase 的学习笔记'
+  description: '记录算法导论、数据结构、数学与计算机基础的个人学习博客。'
   robots:
     index: true
     follow: true
   openGraph:
-    site_name: AstroWind
-    images:
-      - url: '~/assets/images/default.png'
-        width: 1200
-        height: 628
+    site_name: 'brokenvase 的学习笔记'
     type: website
-  twitter:
-    handle: '@arthelokyo'
-    site: '@arthelokyo'
-    cardType: summary_large_image
 
 i18n:
-  language: en
+  language: zh-CN
   textDirection: ltr
 
 apps:

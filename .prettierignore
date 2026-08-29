@@ -1,4 +1,11 @@
 dist
+.astro
 node_modules
+node_modules.nosync
+_local-archive
+local-backups
 .github
 .changeset
+
+# 学习笔记保留作者原有的 Markdown 与公式排版
+src/data/post/*.md
