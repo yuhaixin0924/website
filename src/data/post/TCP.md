@@ -102,7 +102,7 @@ reader.pop(len);                   // 移除对应字节
 先查看可以接受的字符串，再根据实际的接受量来移除，是更好的方式
 ## Reassembler
 ByteStream 按写入顺序保存数据，但网络可能把原本的数据乱序送来，所以需要reassembler暂存乱序数据，处理重叠数据，保证只写入从当前位置开始的连续数据到bytestream
-![reassembler_index](media/17910963518612/reassembler_index.jpg)
+![reassembler_index](../../assets/reassembler_index.jpg)
 对于蓝色区域，这是已经被bytestream popped的字节流，
 而绿色区域是已经被重排好的，还缓存在bytestream中的字节流，
 红色区域是reassembler需要处理的，存在重叠，缺失的片段
