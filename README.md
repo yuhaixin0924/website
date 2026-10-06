@@ -90,6 +90,27 @@ draft: false
 
 文章使用的图片建议放在 `src/assets/images/`，Astro 会在构建时压缩并生成适合浏览器的格式。头像文件是 `src/assets/images/avatar.jpg`；当前 Logo 是 `public/logo.jpg`。
 
+### 表格与流程图
+
+Markdown 表格需要表头和分隔行，表格前后留一行空行：
+
+```markdown
+| 术语 | 含义     |
+| ---- | -------- |
+| ACK  | 确认报文 |
+```
+
+流程图使用 `mermaid` 代码块，网站会自动绘制，并支持深色模式；宽表格和宽流程图可左右滚动：
+
+````markdown
+```mermaid
+flowchart LR
+  A[发送端] --> B[网络] --> C[接收端]
+```
+````
+
+Mermaid 已列入项目依赖，写新文章无需额外安装；关闭 JavaScript 时仍可查看原始代码。
+
 ## 配置与部署
 
 - 网站名称、描述、正式域名和 SEO：`src/config.yaml`

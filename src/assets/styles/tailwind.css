@@ -116,3 +116,69 @@
 .dd *:first-child {
   margin-top: 0;
 }
+
+.post-content .markdown-table-wrapper {
+  margin-block: 1.5em;
+  overflow-x: auto;
+  border: 1px solid var(--tw-prose-td-borders);
+  border-radius: 0.5rem;
+}
+
+.post-content .markdown-table-wrapper table {
+  width: 100%;
+  min-width: 32rem;
+  margin: 0;
+  font-size: 0.875em;
+  line-height: 1.7;
+  border-collapse: collapse;
+}
+
+.post-content .markdown-table-wrapper :is(th, td) {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--tw-prose-td-borders);
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+.post-content .markdown-table-wrapper th {
+  background: rgb(148 163 184 / 12%);
+  text-align: left;
+}
+
+.post-content .markdown-table-wrapper td:first-child {
+  min-width: 9rem;
+}
+
+.post-content .mermaid-diagram {
+  margin-block: 1.5em;
+  padding: 1rem;
+  border: 1px solid var(--tw-prose-td-borders);
+  border-radius: 0.5rem;
+  background: var(--aw-color-bg-page);
+  font-size: 0.875rem;
+}
+
+.mermaid-viewport {
+  overflow-x: auto;
+}
+
+.mermaid-viewport svg {
+  display: block;
+  margin-inline: auto;
+  height: auto;
+}
+
+.mermaid-status {
+  margin-block: 0.75rem;
+  color: var(--aw-color-text-muted);
+}
+
+.mermaid-diagram summary {
+  cursor: pointer;
+}
+
+.mermaid-diagram pre {
+  overflow-x: auto;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}

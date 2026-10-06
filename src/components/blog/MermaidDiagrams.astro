@@ -1,0 +1,89 @@
+<!-- Keep Markdown code as a fallback; load Mermaid only on pages containing diagrams. -->
+<script>
+  const diagrams = new WeakMap<HTMLElement, { source: string; theme?: string }>();
+  let renderId = 0;
+  let renderQueue = Promise.resolve();
+
+  async function renderDiagrams() {
+    const blocks = document.querySelectorAll<HTMLPreElement>('.post-content pre[data-language="mermaid"]');
+    for (const block of blocks) {
+      if (block.closest('.mermaid-diagram')) continue;
+      const source = block.querySelector('code')?.textContent;
+      if (!source) continue;
+
+      const container = document.createElement('figure');
+      container.className = 'mermaid-diagram not-prose';
+      const viewport = document.createElement('div');
+      viewport.className = 'mermaid-viewport';
+      viewport.tabIndex = 0;
+      viewport.setAttribute('role', 'region');
+      viewport.setAttribute('aria-label', '文章流程图（可横向滚动）');
+      const status = document.createElement('figcaption');
+      status.className = 'mermaid-status';
+      status.setAttribute('role', 'status');
+      status.textContent = '正在绘制流程图…';
+      const details = document.createElement('details');
+      const summary = document.createElement('summary');
+      summary.textContent = '查看流程图源代码';
+      details.append(summary);
+      block.replaceWith(container);
+      details.append(block);
+      container.append(viewport, status, details);
+      diagrams.set(container, { source });
+    }
+
+    const containers = [...document.querySelectorAll<HTMLElement>('.mermaid-diagram')];
+    if (!containers.length) return;
+
+    try {
+      const { default: mermaid } = await import('mermaid');
+      const theme = document.documentElement.classList.contains('dark') ? 'dark' : 'default';
+      mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', theme, suppressErrorRendering: true });
+
+      for (const container of containers) {
+        const diagram = diagrams.get(container);
+        if (!diagram || diagram.theme === theme || !container.isConnected) continue;
+        const viewport = container.querySelector<HTMLElement>('.mermaid-viewport')!;
+        const status = container.querySelector<HTMLElement>('.mermaid-status')!;
+        try {
+          const { svg } = await mermaid.render(`post-diagram-${++renderId}`, diagram.source);
+          if (!container.isConnected) continue;
+          viewport.innerHTML = svg;
+          const image = viewport.querySelector('svg');
+          if (image) {
+            image.setAttribute('role', 'img');
+            image.setAttribute('aria-label', '文章流程图');
+            // Keep wide diagrams readable on phones, using horizontal scrolling.
+            const width = image.viewBox.baseVal.width;
+            image.style.width = `${width}px`;
+            image.style.maxWidth = 'none';
+          }
+          diagram.theme = theme;
+          status.textContent = '宽幅流程图可左右滚动查看。';
+        } catch (error) {
+          status.textContent = '流程图绘制失败，可展开下方源代码查看。';
+          container.querySelector('details')!.open = true;
+          console.error('Unable to render article diagram:', error);
+        }
+      }
+    } catch (error) {
+      for (const container of containers) {
+        container.querySelector('.mermaid-status')!.textContent = '流程图加载失败，可展开下方源代码查看。';
+        container.querySelector('details')!.open = true;
+      }
+      console.error('Unable to load Mermaid:', error);
+    }
+  }
+
+  // Serialize renders: Mermaid has global configuration shared across diagrams.
+  function scheduleRender() {
+    renderQueue = renderQueue.then(renderDiagrams);
+  }
+
+  document.addEventListener('astro:page-load', scheduleRender);
+  new MutationObserver(scheduleRender).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['class'],
+  });
+  scheduleRender();
+</script>

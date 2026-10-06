@@ -1,6 +1,7 @@
 import getReadingTime from 'reading-time';
 import { toString } from 'mdast-util-to-string';
 import type { RehypePlugin, RemarkPlugin } from '@astrojs/markdown-remark';
+import type { Element, Root } from 'hast';
 
 export const readingTimeRemarkPlugin: RemarkPlugin = () => {
   return function (tree, file) {
@@ -15,23 +16,29 @@ export const readingTimeRemarkPlugin: RemarkPlugin = () => {
 
 export const responsiveTablesRehypePlugin: RehypePlugin = () => {
   return function (tree) {
-    if (!tree.children) return;
+    const wrapTables = (parent: Root | Element) => {
+      for (let i = 0; i < parent.children.length; i++) {
+        const child = parent.children[i];
+        if (child.type !== 'element') continue;
 
-    for (let i = 0; i < tree.children.length; i++) {
-      const child = tree.children[i];
-
-      if (child.type === 'element' && child.tagName === 'table') {
-        tree.children[i] = {
-          type: 'element',
-          tagName: 'div',
-          properties: {
-            style: 'overflow:auto',
-          },
-          children: [child],
-        };
-
-        i++;
+        if (child.tagName === 'table') {
+          parent.children[i] = {
+            type: 'element',
+            tagName: 'div',
+            properties: {
+              className: ['markdown-table-wrapper'],
+              tabIndex: 0,
+              role: 'region',
+              ariaLabel: '文章表格（可横向滚动）',
+            },
+            children: [child],
+          };
+        } else {
+          wrapTables(child);
+        }
       }
-    }
+    };
+
+    wrapTables(tree);
   };
 };
